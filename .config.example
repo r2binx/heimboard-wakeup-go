@@ -1,0 +1,10 @@
+[BACKEND]
+ORIGINS = "http://localhost:4000", "https://heim.blckct.io", "https://heimboard.vercel.app"
+[WAKEUP]
+BACKEND_IP = 192.168.178.42
+WOL_MAC = 21:69:42:96:24:42
+WAKEUP_PORT = 15000
+WAKEUP_IFACE = eth0
+[AUTH0]
+URL = https://blckct.eu.auth0.com/
+API_AUDIENCE = heimboard
