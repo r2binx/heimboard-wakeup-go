@@ -2,13 +2,14 @@ DESTDIR ?=
 PREFIX ?= /usr/local
 OUTPUT_DIR ?= out
 bin = wakeup
+outfile = $(OUTPUT_DIR)/$(bin).linux-$(shell uname -m)
 
 build:
-	go build -o $(OUTPUT_DIR)/$(bin) ./main.go
-	sudo setcap cap_net_raw+ep $(OUTPUT_DIR)/$(bin)
+	go build -o $(outfile) ./main.go
+	sudo setcap cap_net_raw+ep $(outfile)
 
 run:
-	$(OUTPUT_DIR)/$(bin)
+	$(outfile)
 
 dev: build run
 

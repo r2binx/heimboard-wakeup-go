@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+# Install native dependencies
+apt update
+apt install -y curl make
+
+# Install bagop
+curl -L -o /tmp/bagop "https://github.com/pojntfx/bagop/releases/latest/download/bagop.linux-$(uname -m)"
+install /tmp/bagop /usr/local/bin
+
+# Generate dependencies
+make deps
+
+# Build
+CGO_ENABLED=0 bagop -j "$(nproc)" -b wakeup -x '(386|illumos/*|solaris/*|windows/*|openbsd/arm|android/*|aix/*|ios/*|openbsd/mips64|plan9/*|js/*|netbsd/*|freebsd/arm)' 'main.go'
+
+exit 0
