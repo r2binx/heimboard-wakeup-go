@@ -1,10 +1,15 @@
 [BACKEND]
+; CORS allowed origins
 ORIGINS = "http://localhost:4000", "https://heim.blckct.io", "https://heimboard.vercel.app"
 [WAKEUP]
+; The IP of the 
 BACKEND_IP = 192.168.178.42
+; The MAC of the device which needs to be woken up
 WOL_MAC = 21:69:42:96:24:42
+; The port which this server listens
 WAKEUP_PORT = 15000
-WAKEUP_IFACE = eth0
+; Need to be the network interface of the device this is running on
+WAKEUP_IFACE = eth0 
 [AUTH0]
 URL = https://blckct.eu.auth0.com/
 API_AUDIENCE = heimboard

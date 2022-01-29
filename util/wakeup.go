@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/json"
+
 	"github.com/go-ping/ping"
 	"github.com/mdlayher/wol"
 	"github.com/r2binx/heimboard-wakeup-go/config"
@@ -98,9 +99,9 @@ func (w *Wakeup) CheckSchedule() {
 		scheduledTime := time.Date(now.Year(), now.Month(), now.Day(), scheduledTimestamp.Hour(), scheduledTimestamp.Minute(), 0, 0, time.Local)
 
 		if now.After(scheduledTime) && now.Before(scheduledTime.Add(time.Hour)) {
-			log.Println("Scheduled time reached, performing action:", sched.Action)
 			hostOnline := pingHost(w.config.HostIp)
 			if sched.Action == "boot" && !hostOnline {
+				log.Println("Host is offline, booting")
 				err := w.Wake(w.config.WolMac)
 				if err != nil {
 					log.Println("Failed to wakeup:", err)

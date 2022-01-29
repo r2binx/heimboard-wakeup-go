@@ -14,6 +14,6 @@ install /tmp/bagop /usr/local/bin
 make deps
 
 # Build
-CGO_ENABLED=0 bagop -j "$(nproc)" -b wakeup -x '(386|illumos/*|solaris/*|windows/*|openbsd/arm|android/*|aix/*|ios/*|openbsd/mips64|plan9/*|js/*|netbsd/*|freebsd/arm)' 'main.go'
+CGO_ENABLED=0 bagop -j "$(nproc)" -b wakeup -x '(illumos/*|android/*|aix/*|ios/*|js/*|plan9)' 'main.go'
 
 exit 0
