@@ -75,8 +75,8 @@ var SetScheduleHandler = http.HandlerFunc(func(res http.ResponseWriter, req *htt
 var WakeupHandler = http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 	permitted := checkPermission(res, req, "guest")
 	if permitted {
-		err := w.Wake(conf.WolMac)
-		if err != nil {
+		awake, err := w.Wake(conf.WolMac)
+		if !awake {
 			returnFailure(res, http.StatusInternalServerError, err)
 			return
 		} else {

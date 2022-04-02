@@ -61,14 +61,29 @@ func (w *Wakeup) SetSchedule(schedule schedule.Schedule) error {
 	return nil
 }
 
-func (w *Wakeup) Wake(mac net.HardwareAddr) error {
+func (w *Wakeup) Wake(mac net.HardwareAddr) (bool, error) {
 	c, err := wol.NewRawClient(w.iface)
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer c.Close()
-	log.Println("Waking up:", mac)
-	return c.Wake(mac)
+
+	hostOnline := pingHost(w.config.HostIp)
+	if !hostOnline {
+		log.Println("Waking up:", mac)
+		err := c.Wake(mac)
+		if err != nil {
+			return false, err
+		}
+
+		for i := 0; !hostOnline && i < 12; i++ {
+			log.Println("Host is offline, waiting for it to come online")
+			hostOnline = pingHost(w.config.HostIp)
+			time.Sleep(time.Second * 5)
+		}
+
+	}
+	return hostOnline, nil
 }
 
 func pingHost(host net.IP) bool {
@@ -78,7 +93,7 @@ func pingHost(host net.IP) bool {
 		log.Fatal("Error creating pinger:", err)
 	}
 	pinger.Count = 1
-	pinger.Timeout = time.Second * 5
+	pinger.Timeout = time.Second * 2
 	pinger.Run()
 
 	status = pinger.Statistics().PacketsRecv > 0
@@ -98,15 +113,11 @@ func (w *Wakeup) CheckSchedule() {
 		now := time.Now()
 		scheduledTime := time.Date(now.Year(), now.Month(), now.Day(), scheduledTimestamp.Hour(), scheduledTimestamp.Minute(), 0, 0, time.Local)
 
-		if now.After(scheduledTime) && now.Before(scheduledTime.Add(time.Hour)) {
+		if now.After(scheduledTime) && now.Before(scheduledTime.Add(time.Minute*5)) {
 			hostOnline := pingHost(w.config.HostIp)
 			if sched.Action == "boot" && !hostOnline {
 				log.Println("Host is offline, booting")
-				err := w.Wake(w.config.WolMac)
-				if err != nil {
-					log.Println("Failed to wakeup:", err)
-				}
-				time.Sleep(time.Minute * 2)
+				w.Wake(w.config.WolMac)
 			} else if sched.Action != "boot" {
 				log.Println("Unknown action:", sched.Action)
 			}
